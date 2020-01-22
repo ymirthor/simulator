@@ -27,31 +27,61 @@ def car_path(time = 0, start = (40,40), end = (190,190)):
     x,y = end_x-start_x*time, end_y-start_y*time
     car_display(0, (x,y))
 
+def menu_button_display(text = "Button", align = "^", pos = (0,0), size = (500, 100)):
+    pygame.draw.rect(window, (0,0,0), pos, size)
 
-WIDTH, HEIGHT = 200, 200
-window = pygame.display.set_mode((WIDTH,HEIGHT))
-clock = pygame.time.Clock()
+def menu_display(window):
+    clock = pygame.time.Clock()
+    running = True
+    while running:
+        window.fill((255,255,255))
+
+        menu_button_display()
+
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_a]:
+            angle -= 1
+
+        if pressed[pygame.K_d]:
+            angle += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        clock.tick(60)
 
 
-angle = 0
-running = True
-while running:
-    window.fill((0,0,0))
+def menu():    
+    width, height = 1080, 720
+    window = pygame.display.set_mode((width, height))
+    clock = pygame.time.Clock()
 
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_a]:
-        angle -= 1
+    running = True
+    while running:
+        window.fill((255,255,255))
 
-    if pressed[pygame.K_d]:
-        angle += 1
+        menu_display(window)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_a]:
+            angle -= 1
 
-    #car_path(time)
-    car_display(angle, (40,40))
-    pygame.display.update()
-    clock.tick(60)
+        if pressed[pygame.K_d]:
+            angle += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        #car_path(time)
+        car_display(angle, (40,40))
+        pygame.display.update()
+        clock.tick(60)
+
+def game():
+    menu()
+
+game()
 
 pygame.quit()
