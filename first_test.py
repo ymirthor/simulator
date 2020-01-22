@@ -33,16 +33,24 @@ window = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
 
 
-time = 0
+angle = 0
 running = True
 while running:
     window.fill((0,0,0))
+
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_a]:
+        angle -= 1
+
+    if pressed[pygame.K_d]:
+        angle += 1
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    
-    time += 0.001
-    car_path(time)
+
+    #car_path(time)
+    car_display(angle, (40,40))
     pygame.display.update()
     clock.tick(60)
 
