@@ -1,6 +1,14 @@
 import pygame
 import math
+HEIGHT = 500
+WIDTH = 1000
+WINDOW_SIZE = (WIDTH, HEIGHT)
 
+WHITE = (255,255,255)
+BLACK = (0,0,0)
+
+def center(length1, length2):
+    return int(length1)//2 - int(length2)//2
 def car_display(angle, pos, size = (20,10), color = (20,200,20)):
     radians = angle * (math.pi / 180)
     x, y = pos
@@ -27,60 +35,61 @@ def car_path(time = 0, start = (40,40), end = (190,190)):
     x,y = end_x-start_x*time, end_y-start_y*time
     car_display(0, (x,y))
 
-def menu_button_display(text = "Button", align = "^", pos = (0,0), size = (500, 100)):
-    pygame.draw.rect(window, (0,0,0), pos, size)
+def menu_button_display(window, color, pos, size, myfont, text = "Button", textColor = WHITE):
+    pygame.draw.rect(window, color, [pos,size])
 
-def menu_display(window):
-    clock = pygame.time.Clock()
-    running = True
-    while running:
-        window.fill((255,255,255))
+    textsurface = myfont.render(str(text), True, textColor)
+    pos = [pos[0] + size[0]//2 - textsurface.get_rect()[2]//2, 
+           pos[1] + size[1]//2 - textsurface.get_rect()[3]//2]
 
-        menu_button_display()
+    window.blit(textsurface, pos)
 
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_a]:
-            angle -= 1
+def menu_display(window, myfont):
+    margin = 200 # Sides
+    margin_top = 100
+    spacing = 5
+    button_height = 100
+    button_width = WIDTH - (2 * margin)
+    buttons_size = (button_width, button_height)
+    button_center = center(WIDTH, button_width)
+    next = spacing + button_height
 
-        if pressed[pygame.K_d]:
-            angle += 1
+    pos = (button_center, margin_top)
+    menu_button_display(window, BLACK, pos, buttons_size, myfont, "Play")
+    
+    pos = (button_center, margin_top + 1*next)
+    menu_button_display(window, BLACK, pos, buttons_size, myfont, "Map")
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        clock.tick(60)
-
-
-def menu():    
-    width, height = 1080, 720
-    window = pygame.display.set_mode((width, height))
-    clock = pygame.time.Clock()
-
-    running = True
-    while running:
-        window.fill((255,255,255))
-
-        menu_display(window)
-
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_a]:
-            angle -= 1
-
-        if pressed[pygame.K_d]:
-            angle += 1
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        #car_path(time)
-        car_display(angle, (40,40))
-        pygame.display.update()
-        clock.tick(60)
+    pos = (button_center, margin_top + 2*next)
+    menu_button_display(window, BLACK, pos, buttons_size, myfont, "Settings")
+    
 
 def game():
-    menu()
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Comic Sans MS', 40)
+    window = pygame.display.set_mode(WINDOW_SIZE)
+    clock = pygame.time.Clock()
+    pressed = pygame.key.get_pressed()
+    screen = 0
+    
+    running = True
+    while running:
+        window.fill(WHITE)
+        if screen == 0:
+            menu_display(window, myfont)
+        
+        if pressed[pygame.K_a]:
+            angle -= 1
+
+        if pressed[pygame.K_d]:
+            angle += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        pygame.display.update()
+        clock.tick(10)
 
 game()
 
