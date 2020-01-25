@@ -9,7 +9,8 @@ BLACK = (0,0,0)
 
 def center(length1, length2):
     return int(length1)//2 - int(length2)//2
-def car_display(angle, pos, size = (20,10), color = (20,200,20)):
+
+def car_display(window, angle, pos, size = (20,10), color = (20,200,20)):
     radians = angle * (math.pi / 180)
     x, y = pos
     w, h = size
@@ -35,14 +36,23 @@ def car_path(time = 0, start = (40,40), end = (190,190)):
     x,y = end_x-start_x*time, end_y-start_y*time
     car_display(0, (x,y))
 
+def check_click_on(rect, ret):
+    pos = pygame.mouse.get_pos()
+    pressed = pygame.mouse.get_pressed()
+    if (rect[0] <= pos[0] <= rect[2] + rect[0]) and (rect[1] <= pos[1] <= rect[3] + rect[1]) and pressed[0]:
+        return ret
+    else:
+        return False
+
 def menu_button_display(window, color, pos, size, myfont, text = "Button", textColor = WHITE):
-    pygame.draw.rect(window, color, [pos,size])
+    button = pygame.draw.rect(window, color, [pos,size])
 
     textsurface = myfont.render(str(text), True, textColor)
     pos = [pos[0] + size[0]//2 - textsurface.get_rect()[2]//2, 
            pos[1] + size[1]//2 - textsurface.get_rect()[3]//2]
 
     window.blit(textsurface, pos)
+    return button
 
 def menu_display(window, myfont):
     margin = 200 # Sides
@@ -55,35 +65,54 @@ def menu_display(window, myfont):
     next = spacing + button_height
 
     pos = (button_center, margin_top)
-    menu_button_display(window, BLACK, pos, buttons_size, myfont, "Play")
-    
+    button = menu_button_display(window, BLACK, pos, buttons_size, myfont, "Play")
+    screen = check_click_on(button, 2)
+
     pos = (button_center, margin_top + 1*next)
-    menu_button_display(window, BLACK, pos, buttons_size, myfont, "Map")
+    button = menu_button_display(window, BLACK, pos, buttons_size, myfont, "Map")
+    if not screen:
+        screen = check_click_on(button, 1)
 
     pos = (button_center, margin_top + 2*next)
-    menu_button_display(window, BLACK, pos, buttons_size, myfont, "Settings")
+    button = menu_button_display(window, BLACK, pos, buttons_size, myfont, "Settings")
+    if not screen:
+        screen = check_click_on(button, 3)
     
+    return screen
+
+def map_display(window, myfont):
+    textsurface = myfont.render("Map", True, BLACK)
+    window.blit(textsurface, (0,0))
+
+def game_display(window, myfont):
+    textsurface = myfont.render("Game", True, BLACK)
+    window.blit(textsurface, (0,0))
+
+    car_display(window, 45, (100,100), (100,50))
+
+def settings_display(window, myfont):
+    textsurface = myfont.render("Settings", True, BLACK)
+    window.blit(textsurface, (0,0))
 
 def game():
     pygame.font.init()
-    myfont = pygame.font.SysFont('Comic Sans MS', 40)
+    myfont = pygame.font.SysFont('arial', 40)
     window = pygame.display.set_mode(WINDOW_SIZE)
     clock = pygame.time.Clock()
     pressed = pygame.key.get_pressed()
     screen = 0
-    
+    screens = {0 : menu_display,
+               1 : map_display,
+               2 : game_display,
+               3 : settings_display}
+
     running = True
     while running:
         window.fill(WHITE)
-        if screen == 0:
-            menu_display(window, myfont)
+        change_screen = screens[screen](window, myfont)
+        if change_screen:
+            screen = change_screen
         
-        if pressed[pygame.K_a]:
-            angle -= 1
-
-        if pressed[pygame.K_d]:
-            angle += 1
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
